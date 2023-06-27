@@ -1,141 +1,84 @@
-<script>
-import axios from 'axios';
-
-import SearchBar from './components/SearchBar.vue';
-import FilterBar from './components/FilterBar.vue';
-import BookList from './components/BookList.vue';
-import ModalLayer from './components/ModalLayer.vue';
-import BookForm from './components/BookForm.vue';
-
-export default {
-  name: 'App',
-  components: {
-    SearchBar,
-    FilterBar,
-    BookList,
-    ModalLayer,
-    BookForm,
-  },
-  data() {
-    return {
-      showModal: false,
-      sortBy: 'title',
-      orderBy: 'asc',
-      favourite: false,
-      searchTerm: '',
-      bookList: [],
-    };
-  },
-  computed: {
-    filteredBooks() {
-      let bookList = this.bookList;
-
-      bookList = bookList.sort((a, b) => {
-        if (this.sortBy === 'title') {
-          return a.title.localeCompare(b.title);
-        } else if (this.sortBy === 'author') {
-          return a.author.localeCompare(b.author);
-        } else if (this.sortBy === 'year') {
-          return a.year - b.year;
-        } else if (this.sortBy === 'pages') {
-          return a.pages - b.pages;
-        } else if (this.sortBy === 'price') {
-          return a.price - b.price;
-        } else if (this.sortBy === 'stock') {
-          return a.stock - b.stock;
-        } else if (this.sortBy === 'rating') {
-          return a.rating - b.rating;
-        }
-      });
-      if (this.orderBy === 'desc') {
-        bookList = bookList.reverse();
-      }
-      if (this.favourite) {
-        bookList = this.bookList.filter((book) => book.favourite);
-      }
-
-      if (!this.searchTerm) {
-        return bookList;
-      } else {
-        bookList = this.bookList.filter((book) => {
-          return (
-            book.title.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-            book.author.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-            book.description.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-            book.genre.some((item) => item.toLowerCase().includes(this.searchTerm.toLowerCase()))
-          );
-        });
-      }
-      return bookList;
-    },
-  },
-  mounted() {
-    this.fetchBooks();
-  },
-  methods: {
-    async fetchBooks() {
-      const req = await axios.get('http://localhost:3000/catalog');
-      this.bookList = req.data.recipes;
-    },
-    async addBook(book) {
-      const req = await axios.post('http://localhost:3000/book', book);
-      if (req.status === 200) {
-        await this.fetchBooks();
-        this.toggleForm();
-      }
-    },
-    async deleteBook(id) {
-      const req = await axios({
-        method: 'DELETE',
-        url: `http://localhost:3000/book/`,
-        data: {
-          id: id,
-        },
-      });
-      if (req.status === 200) {
-        this.fetchBooks();
-      }
-    },
-    toggleForm() {
-      this.showModal = !this.showModal;
-    },
-    setSearchTerm(value) {
-      this.searchTerm = value;
-    },
-    sortBooks(sortBy) {
-      this.sortBy = sortBy;
-    },
-    orderBooks(orderBy) {
-      this.orderBy = orderBy;
-    },
-    favouriteBooks(favourite) {
-      this.favourite = favourite;
-    },
-  },
-};
-</script>
-
 <template>
   <header class="header">
-    <div class="header__left">
+    <div class="left" @click="goHomeLink">
       <img class="logo" src="./assets/uoc-logo.png" alt="UOC logo" />
-      <h1 class="title">Book manager</h1>
+      <h1 class="app-name">Pokedex</h1>
+    </div>
+    <div class="right">
+      <button v-if="!isLogged" class="login-button" @click="toggleForm">Login</button>
+      <p v-if="isLogged" class="user" @click="goProfileLink">{{ loggedName }}</p>
+      <button v-if="isLogged" class="logout-button" @click="logout">Logout</button>
     </div>
   </header>
-  <SearchBar @show-form="toggleForm" @search="setSearchTerm" />
-  <FilterBar @sort-items="sortBooks" @order-items="orderBooks" @favourite-items="favouriteBooks" />
-  <main class="main">
-    <BookList :books="filteredBooks" @delete-book="deleteBook" />
-  </main>
-  <ModalLayer v-if="showModal" @close-modal="toggleForm">
+  <router-view></router-view>
+  <ModalLayer v-if="showModal" :mode-small="true" @close-modal="toggleForm">
     <template #header>
-      <h2>Add a new book</h2>
+      <h2>Login</h2>
     </template>
     <template #body>
-      <BookForm @add-book="addBook" />
+      <LoginForm @login-user="login" />
     </template>
   </ModalLayer>
 </template>
+
+<script setup>
+import { ref, computed } from 'vue';
+
+import { useUserStore } from './stores/user/UserStore';
+import { useRouter } from 'vue-router';
+
+import ModalLayer from './components/ModalLayer.vue';
+import LoginForm from './components/forms/LoginForm.vue';
+
+import axios from 'axios';
+
+const userStore = useUserStore();
+const router = useRouter();
+
+const showModal = ref(false);
+
+function goHomeLink() {
+  router.replace('/');
+}
+
+function goProfileLink() {
+  router.replace('/profile');
+}
+
+const isLogged = computed(() => {
+  return userStore.isLogged;
+});
+
+const loggedName = computed(() => {
+  return userStore.getName;
+});
+
+function toggleForm() {
+  showModal.value = !showModal.value;
+}
+
+async function login(user) {
+  const req = await axios.post('http://localhost:3000/login', user);
+  if (req.data.error) {
+    alert(req.data.mensaje);
+  } else {
+    userStore.setUserData({
+      logged: true,
+      name: req.data.data.name,
+      token: req.data.data.tokenId,
+    });
+    toggleForm();
+  }
+}
+
+function logout() {
+  userStore.setUserData({
+    logged: false,
+    name: '',
+    token: '',
+  });
+}
+</script>
 
 <style>
 body {
@@ -148,23 +91,43 @@ body {
   color: #2c3e50;
 }
 .header {
+  padding: 15px;
   display: flex;
+  align-items: center;
+  border-bottom: 1px solid #ccc;
   justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
-  background-color: #f5f5f5;
-  border-bottom: 1px solid #e5e5e5;
 }
-.header__left {
+.header .left {
   display: flex;
   align-items: center;
 }
-.logo {
-  height: 40px;
-  margin-right: 10px;
+.header .right {
+  display: flex;
+  align-items: center;
 }
-.title {
-  font-size: 24px;
-  font-weight: 400;
+.header .logo {
+  max-height: 50px;
+}
+.header .app-name {
+  margin-left: 25px;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.header .user {
+  display: flex;
+  color: #2c3e50;
+  font-weight: bold;
+  text-decoration: none;
+}
+.header .login-button,
+.header .logout-button {
+  background: #2c3e50;
+  color: #fff;
+  border: 0;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 15px;
 }
 </style>
