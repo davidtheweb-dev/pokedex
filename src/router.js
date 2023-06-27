@@ -1,23 +1,34 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
-const PokemonList = () => import('./pages/pokemon/PokemonList.vue');
-const PokemonDetail = () => import('./pages/pokemon/PokemonList.vue');
+import { useUserStore } from './stores/user/UserStore';
+
+const PokemonHome = () => import('./pages/pokemon/PokemonHome.vue');
+const PokemonDetail = () => import('./pages/pokemon/PokemonDetail.vue');
 const ProfileDetail = () => import('./pages/profile/ProfileDetail.vue');
 const NotFound = () => import('./pages/NotFound.vue');
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: '/', redirect: '/pokemon' },
-    { path: '/pokemon', component: PokemonList },
+    { path: '/', component: PokemonHome },
     {
-      path: '/pokemon/:id',
+      path: '/:id',
       component: PokemonDetail,
       props: true,
+      meta: { requiresAuth: true },
     },
-    { path: '/profile', component: ProfileDetail },
+    { path: '/profile', component: ProfileDetail, meta: { requiresAuth: true } },
     { path: '/:notFound(.*)', component: NotFound },
   ],
+});
+
+router.beforeEach(function (to, _, next) {
+  const userStore = useUserStore();
+  if (to.meta.requiresAuth && !userStore.isLogged) {
+    next('/');
+  } else {
+    next();
+  }
 });
 
 export default router;
