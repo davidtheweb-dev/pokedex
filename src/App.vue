@@ -23,27 +23,17 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-
 import { useUserStore } from './stores/user/UserStore';
 import { useRouter } from 'vue-router';
+import axios from 'axios';
 
 import ModalLayer from './components/ModalLayer.vue';
 import LoginForm from './components/forms/LoginForm.vue';
-
-import axios from 'axios';
 
 const userStore = useUserStore();
 const router = useRouter();
 
 const showModal = ref(false);
-
-function goHomeLink() {
-  router.replace('/');
-}
-
-function goProfileLink() {
-  router.replace('/profile');
-}
 
 const isLogged = computed(() => {
   return userStore.isLogged;
@@ -52,10 +42,6 @@ const isLogged = computed(() => {
 const loggedName = computed(() => {
   return userStore.getName;
 });
-
-function toggleForm() {
-  showModal.value = !showModal.value;
-}
 
 async function login(user) {
   const req = await axios.post('http://localhost:3000/login', user);
@@ -77,6 +63,18 @@ function logout() {
     name: '',
     token: '',
   });
+}
+
+function toggleForm() {
+  showModal.value = !showModal.value;
+}
+
+function goHomeLink() {
+  router.replace('/');
+}
+
+function goProfileLink() {
+  router.replace('/profile');
 }
 </script>
 

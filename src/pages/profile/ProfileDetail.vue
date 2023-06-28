@@ -14,10 +14,8 @@
 
 <script setup>
 import { computed, reactive, onMounted, watch } from 'vue';
-
 import { useUserStore } from '../../stores/user/UserStore';
 import { useRouter } from 'vue-router';
-
 import axios from 'axios';
 
 const userStore = useUserStore();

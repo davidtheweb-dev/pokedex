@@ -20,16 +20,14 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
+import { useUserStore } from '../../stores/user/UserStore';
+import axios from 'axios';
 
 import SearchBar from '../../components/SearchBar.vue';
 import FilterBar from '../../components/FilterBar.vue';
 import PokemonList from '../../components/PokemonList.vue';
 import ModalLayer from '../../components/ModalLayer.vue';
 import PokemonForm from '../../components/forms/PokemonForm.vue';
-
-import { useUserStore } from '../../stores/user/UserStore';
-
-import axios from 'axios';
 
 const userStore = useUserStore();
 
