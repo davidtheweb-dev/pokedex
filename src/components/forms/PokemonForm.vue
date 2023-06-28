@@ -1,157 +1,114 @@
-<script setup>
-import { uuid } from 'vue-uuid';
-import { reactive } from 'vue';
-
-const emit = defineEmits(['close-modal', 'add-book']);
-
-const book = reactive({
-  title: '',
-  author: '',
-  description: '',
-  year: '',
-  pages: '',
-  genre: '',
-  editorial: '',
-  language: '',
-  isbn: '',
-  price: '',
-  stock: '',
-  favourite: false,
-  rating: '',
-  cover: '',
-});
-
-function resetBook() {
-  book.title = '';
-  book.author = '';
-  book.description = '';
-  book.year = '';
-  book.pages = '';
-  book.genre = '';
-  book.editorial = '';
-  book.language = '';
-  book.isbn = '';
-  book.stock = '';
-  book.favourite = false;
-  book.rating = '';
-  book.cover = '';
-}
-
-function createBook() {
-  if ((book.title === '' || book.author === '', book.description === '')) {
-    alert('Please fill in the title and author fields');
-    return;
-  }
-  book.id = uuid.v4();
-  book.genre = book.genre.split(',');
-  const bookToBeAdded = { ...book };
-  emit('add-book', bookToBeAdded);
-  resetBook();
-}
-</script>
-
 <template>
-  <div class="book-form">
-    <form class="book-form__form" @submit.prevent="createBook">
-      <div class="book-form__form-group">
-        <label for="title">Title</label>
-        <input id="title" v-model="book.title" type="text" />
+  <div>
+    <form class="form__form" @submit.prevent="createPokemon">
+      <div class="form__form-group">
+        <label for="name">Name</label>
+        <input id="name" v-model="pokemon.name" type="text" />
       </div>
-      <div class="book-form__form-group">
-        <label for="author">Author</label>
-        <input id="author" v-model="book.author" type="text" />
+      <div class="form__form-group">
+        <label for="species">Species</label>
+        <input id="species" v-model="pokemon.species" type="text" />
       </div>
-      <div class="book-form__form-group">
+      <div class="form__form-group">
+        <label for="types">Types</label>
+        <input id="types" v-model="pokemon.types" type="text" />
+      </div>
+      <div class="form__form-group">
         <label for="description">Description</label>
-        <textarea id="description" v-model="book.description"></textarea>
+        <textarea id="description" v-model="pokemon.description"></textarea>
       </div>
-      <div class="book-form__form-group">
-        <label for="year">Year</label>
-        <input id="year" v-model="book.year" type="number" />
+      <div class="form__form-group">
+        <label for="abilities">Abilities</label>
+        <input id="abilities" v-model="pokemon.abilities" type="text" />
       </div>
-      <div class="book-form__form-group">
-        <label for="pages">Pages</label>
-        <input id="pages" v-model="book.pages" type="number" />
+      <div class="form__form-group">
+        <label for="height">Height</label>
+        <input id="height" v-model="pokemon.height" type="text" />
       </div>
-      <div class="book-form__form-group">
-        <label for="genre">Genre</label>
-        <input id="genre" v-model="book.genre" type="text" />
+      <div class="form__form-group">
+        <label for="weight">Weight</label>
+        <input id="weight" v-model="pokemon.weight" type="text" />
       </div>
-      <div class="book-form__form-group">
-        <label for="editorial">Editorial</label>
-        <input id="editorial" v-model="book.editorial" type="text" />
+      <div class="form__form-group">
+        <label for="sprite">Sprite</label>
+        <input id="sprite" v-model="pokemon.sprite" type="text" />
       </div>
-      <div class="book-form__form-group">
-        <label for="language">Language</label>
-        <select id="language" v-model="book.language">
-          <option value="en">English</option>
-          <option value="es">Spanish</option>
-          <option value="fr">French</option>
-          <option value="de">German</option>
-          <option value="it">Italian</option>
-          <option value="pt">Portuguese</option>
-          <option value="ru">Russian</option>
-          <option value="zh">Chinese</option>
-          <option value="ja">Japanese</option>
-        </select>
+      <div class="form__form-group">
+        <label for="captured">Captured</label>
+        <input id="captured" v-model="pokemon.captured" type="checkbox" />
       </div>
-      <div class="book-form__form-group">
-        <label for="isbn">ISBN</label>
-        <input id="isbn" v-model="book.isbn" type="text" />
-      </div>
-      <div class="book-form__form-group">
-        <label for="price">Price</label>
-        <input id="price" v-model="book.price" type="number" />
-      </div>
-      <div class="book-form__form-group">
-        <label for="stock">Stock</label>
-        <input id="stock" v-model="book.stock" type="number" />
-      </div>
-      <div class="book-form__form-group">
-        <label for="favourite">Favourite</label>
-        <input id="favourite" v-model="book.favourite" type="checkbox" />
-      </div>
-      <div class="book-form__form-group">
-        <label for="rating">Rating</label>
-        <select id="rating" v-model="book.rating">
-          <option value="1">1 star</option>
-          <option value="2">2 stars</option>
-          <option value="3">3 stars</option>
-          <option value="4">4 stars</option>
-          <option value="5">5 stars</option>
-        </select>
-      </div>
-      <div class="book-form__form-group">
-        <label for="image">Image</label>
-        <input id="image" v-model="book.cover" type="text" />
-      </div>
-      <div class="book-form__form-group">
-        <button type="submit" class="book-form__submit">Add book</button>
+
+      <div class="form__form-group">
+        <button type="submit" class="form__submit">Add pokemon</button>
       </div>
     </form>
   </div>
 </template>
 
+<script setup>
+import { reactive } from 'vue';
+import { uuid } from 'vue-uuid';
+
+const emit = defineEmits(['close-modal', 'add-pokemon']);
+
+const pokemon = reactive({
+  name: '',
+  species: '',
+  types: '',
+  description: '',
+  abilities: '',
+  height: '',
+  weight: '',
+  sprite: '',
+  captured: false,
+});
+
+function resetPokemon() {
+  pokemon.name = '';
+  pokemon.species = '';
+  pokemon.types = '';
+  pokemon.description = '';
+  pokemon.abilities = '';
+  pokemon.height = '';
+  pokemon.weight = '';
+  pokemon.sprite = '';
+  pokemon.captured = false;
+}
+
+function createPokemon() {
+  if ((pokemon.name === '' || pokemon.species === '', pokemon.types === '')) {
+    alert('Please fill in the name, species and types fields');
+    return;
+  }
+  pokemon.id = uuid.v4();
+  pokemon.types = pokemon.types.split(',');
+  pokemon.abilities = pokemon.abilities.split(',');
+  const pokemonToBeAdded = { ...pokemon };
+  emit('add-pokemon', pokemonToBeAdded);
+  resetPokemon();
+}
+</script>
+
 <style scoped>
-.book-form__form {
+.form__form {
   display: flex;
   flex-wrap: wrap;
 }
-.book-form__form-group {
+.form__form-group {
   margin-bottom: 20px;
   width: 50%;
   display: flex;
   flex-direction: column;
 }
-.book-form__form-group label {
+.form__form-group label {
   display: block;
   margin-bottom: 10px;
   text-align: left;
   font-size: 14px;
 }
-.book-form__form-group input,
-.book-form__form-group textarea,
-.book-form__form-group select {
+.form__form-group input,
+.form__form-group select,
+.form__form-group textarea {
   width: 80%;
   padding: 10px;
   border: 1px solid #e5e5e5;
@@ -159,15 +116,14 @@ function createBook() {
   outline: none;
   text-align: left;
 }
-.book-form__form-group input:focus,
-.book-form__form-group textarea:focus,
-.book-form__form-group select:focus {
+.form__form-group input:focus,
+.form__form-group textarea:focus {
   border-color: #000;
 }
-.book-form__form-group textarea {
+.form__form-group textarea {
   height: 100px;
 }
-.book-form__submit {
+.form__submit {
   padding: 10px;
   border: 1px solid #e5e5e5;
   border-radius: 4px;
@@ -177,7 +133,7 @@ function createBook() {
   background-color: #4caf50;
   color: #fff;
 }
-.book-form__submit:hover {
+.form__submit:hover {
   background-color: #43a047;
 }
 </style>
