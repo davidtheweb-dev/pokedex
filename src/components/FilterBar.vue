@@ -1,41 +1,11 @@
-<script setup>
-import { ref, watch } from 'vue';
-
-const emit = defineEmits(['sort-items', 'order-items', 'favourite-items']);
-
-const sortBy = ref('title');
-watch(sortBy, () => {
-  emit('sort-items', sortBy);
-});
-
-const orderBy = ref('asc');
-watch(orderBy, () => {
-  emit('order-items', orderBy);
-});
-
-const favourite = ref(false);
-watch(favourite, () => {
-  emit('favourite-items', favourite);
-});
-</script>
-
 <template>
   <div class="filter-bar">
     <div class="filter-bar__select">
       <label for="sort">Sort by:</label>
       <select id="sort" v-model="sortBy">
-        <option value="title">Title</option>
-        <option value="author">Author</option>
-        <option value="year">Year</option>
-        <option value="pages">Pages</option>
-        <option value="genre">Genre</option>
-        <option value="editorial">Editorial</option>
-        <option value="language">Language</option>
-        <option value="isbn">ISBN</option>
-        <option value="price">Price</option>
-        <option value="stock">Stock</option>
-        <option value="favorite">Favorite</option>
-        <option value="rating">Rating</option>
+        <option value="name">Name</option>
+        <option value="type">Type</option>
+        <option value="abilities">Abilities</option>
       </select>
     </div>
     <div class="filter-bar__select">
@@ -45,12 +15,40 @@ watch(favourite, () => {
         <option value="desc">Descending</option>
       </select>
     </div>
-    <div class="filter-bar__check">
-      <input id="favourites" v-model="favourite" type="checkbox" />
-      <label for="favourites">Favourite</label>
+    <div v-if="isLogged" class="filter-bar__check">
+      <input id="captured" v-model="captured" type="checkbox" />
+      <label for="captured">Captured</label>
     </div>
   </div>
 </template>
+
+<script setup>
+import { ref, watch, computed } from 'vue';
+import { useUserStore } from '../stores/user/UserStore';
+
+const emit = defineEmits(['sort-items', 'order-items', 'captured-pokemons']);
+
+const userStore = useUserStore();
+
+const isLogged = computed(() => {
+  return userStore.isLogged;
+});
+
+const sortBy = ref('name');
+watch(sortBy, () => {
+  emit('sort-items', sortBy);
+});
+
+const orderBy = ref('asc');
+watch(orderBy, () => {
+  emit('order-items', orderBy);
+});
+
+const captured = ref(false);
+watch(captured, () => {
+  emit('captured-pokemons', captured);
+});
+</script>
 
 <style scoped>
 .filter-bar {
