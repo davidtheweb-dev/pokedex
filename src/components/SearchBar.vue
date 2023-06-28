@@ -1,12 +1,29 @@
+<template>
+  <div class="search-bar">
+    <input v-model="search" type="text" placeholder="Search pokemon" />
+    <button type="button" class="clear" @click="clearSearch">Clear</button>
+    <button v-if="isLogged" type="button" class="add" @click="showForm">Add</button>
+  </div>
+</template>
+
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
+import { useUserStore } from '../stores/user/UserStore';
 
 const emit = defineEmits(['show-form', 'search']);
 
+const userStore = useUserStore();
+
+const isLogged = computed(() => {
+  return userStore.isLogged;
+});
+
 const search = ref('');
+
 watch(search, () => {
   emit('search', search);
 });
+
 function clearSearch() {
   search.value = '';
 }
@@ -15,14 +32,6 @@ function showForm() {
   emit('show-form');
 }
 </script>
-
-<template>
-  <div class="search-bar">
-    <input v-model="search" type="text" placeholder="Search book" />
-    <button type="button" class="clear" @click="clearSearch">Clear</button>
-    <button type="button" class="add" @click="showForm">Add book</button>
-  </div>
-</template>
 
 <style scoped>
 .search-bar {
