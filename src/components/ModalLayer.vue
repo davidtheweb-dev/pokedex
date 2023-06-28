@@ -1,22 +1,7 @@
-<script setup>
-defineProps({
-  showModal: {
-    type: Boolean,
-    default: false,
-  },
-});
-
-const emit = defineEmits(['close-modal']);
-
-function closeModal() {
-  emit('close-modal');
-}
-</script>
-
 <template>
   <div class="modal">
     <div class="modal__overlay"></div>
-    <div class="modal__content">
+    <div :class="['modal__content', { small__modal: modeSmall }]">
       <div class="modal__header">
         <slot name="header"></slot>
         <button type="button" class="modal__close" @click="closeModal">
@@ -29,6 +14,25 @@ function closeModal() {
     </div>
   </div>
 </template>
+
+<script setup>
+defineProps({
+  showModal: {
+    type: Boolean,
+    default: false,
+  },
+  modeSmall: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+const emit = defineEmits(['close-modal']);
+
+function closeModal() {
+  emit('close-modal');
+}
+</script>
 
 <style scoped>
 .modal {
@@ -57,6 +61,10 @@ function closeModal() {
   background-color: #fff;
   border-radius: 4px;
   padding: 30px;
+}
+.small__modal {
+  width: 35%;
+  height: 30%;
 }
 .modal__header {
   display: flex;
